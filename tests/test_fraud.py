@@ -239,3 +239,49 @@ class TestFraudDetectionStructural:
         assert result.verification_required == False
         assert result.risk_score == 0
 
+# TESTE 7 modificado para 100% de coverage: Caso de Borda - 10 Transações e Valor Exatamente 10000
+    def test_boundary_modified(self):
+        """
+        Resultado esperado:
+        - is_fraudulent = False
+        - is_blocked = False
+        - verification_required = False
+        - risk_score = 0
+        """
+        base_time = datetime(2025, 10, 16, 13, 0, 0)
+        previous_transactions = []
+
+        previous_transactions.append(
+            Transaction(
+                amount=50.00,
+                location='Brasil',
+                timestamp=datetime(2025, 10, 16, 12, 0, 0)
+            )
+        )
+        
+        for i in range(10):
+            previous_transactions.append(
+                Transaction(
+                    amount=50.00,
+                    location='Brasil',
+                    timestamp=base_time + timedelta(minutes=i*6)
+                )
+            )
+        
+        current_transaction = Transaction(
+            amount=10000.00,
+            location='Brasil',
+            timestamp=datetime(2025, 10, 16, 14, 0, 0)
+        )
+        blacklisted_locations = []
+        
+        result = self.fraud_system.check_for_fraud(
+            current_transaction,
+            previous_transactions,
+            blacklisted_locations
+        )
+        
+        assert result.is_fraudulent == False
+        assert result.is_blocked == False
+        assert result.verification_required == False
+        assert result.risk_score == 0
